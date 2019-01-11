@@ -1,0 +1,31 @@
+{
+  "name": "kaboom.services.web",
+  "version": "1.0.0",
+  "description": "Kaboom Web Services",
+  "main": "app.js",
+  "author": {
+    "name": "artemkv",
+    "email": "artemkv@gmail.com"
+  },
+  "dependencies": {
+    "@artemkv/errorhandler": "1.0.1",
+    "@artemkv/myrequest": "1.0.1",
+    "@artemkv/resterror": "1.0.0",
+    "@artemkv/reststats": "1.0.0",
+    "@artemkv/statuscodes": "1.0.2",
+    "@artemkv/statusmessages": "1.0.0",
+    "@artemkv/readjsonstream": "1.0.0",
+    "connect": "^3.6.6",
+    "dotenv": "^6.2.0",
+    "google-auth-library": "^2.0.2",
+    "serve-favicon": "^2.4.3"
+  },
+  "devDependencies": {
+    "mocha": "5.2.0",
+    "chai": "4.1.1",
+    "request": "2.88.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  }
+}

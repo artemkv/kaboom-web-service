@@ -10,6 +10,8 @@ const myRequest = require('@artemkv/myrequest');
 const version = require('./myversion');
 const signinController = require('./signincontroller');
 const crashesController = require('./crashesController');
+const authenticate = require('./authenticate');
+const authorize = require('./authorize');
 
 dotenv.config();
 let env = process.env;
@@ -42,6 +44,9 @@ server
     // Sign-in - stores user id_token in the session
     .use('/signin', signinController.postToken)
     // TODO: provide sign-out
+
+    .use(authenticate)
+    .use(authorize)
 
     // Business logic
     .use('/crashes', crashesController.getCrashes)

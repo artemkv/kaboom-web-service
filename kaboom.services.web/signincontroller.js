@@ -57,7 +57,9 @@ const postToken = function postToken(req, res, next) {
             restStats.updateResponseStats(req, res);
         })
         .catch(function (err) {
-            next(err);
+            console.log(err); // TODO: log somewhere else
+            // Any error while validating the token is considered unauthorized access
+            next(new RestError(statusCodes.Unauthorized, statusMessages.Unauthorized));
         });
 }
 

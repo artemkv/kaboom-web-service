@@ -11,6 +11,7 @@ const version = require('./myversion');
 const authenticate = require('./authenticate');
 const authorize = require('./authorize');
 const signinController = require('./signincontroller');
+const signoutController = require('./signoutcontroller');
 const crashesController = require('./crashesController');
 const crashController = require('./crashController');
 
@@ -44,7 +45,7 @@ server
 
     // Sign-in - stores user id_token in the session
     .use('/signin', signinController.postToken)
-    // TODO: provide sign-out
+    .use('/signout', signoutController.post)
 
     // *** Enter the protected area ***
     .use(authenticate)

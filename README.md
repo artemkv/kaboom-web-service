@@ -8,6 +8,10 @@ POST /signin
 
 Initializes the client session
 
+POST /signout
+
+Closes the client session
+
 GET /crashes
 
 Returns

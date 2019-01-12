@@ -1,14 +1,13 @@
 "use strict";
 
 const MAX_LENGTH = 2000;
-const CLIENT_ID = '1012739762252-agthbe2e8df58pj08q4rpcejs8ndkq7e.apps.googleusercontent.com'; // TODO: environment?
 
 const statusCodes = require('@artemkv/statuscodes');
 const statusMessages = require('@artemkv/statusmessages');
 const RestError = require('@artemkv/resterror');
 const restStats = require('@artemkv/reststats');
 const readJsonStream = require('@artemkv/readjsonstream');
-const googleAuth = require('google-auth-library');
+const userService = require('./userservice');
 
 const postToken = function (req, res, next) {
     // TODO: this is for debug
@@ -30,27 +29,29 @@ const postToken = function (req, res, next) {
 
     let promise = new Promise(readJsonStream(req, MAX_LENGTH));
 
+    let id_token = null;
     promise
-        .then(function validateToken(id_token) {
-            let authClient = new googleAuth.OAuth2Client(CLIENT_ID);
-            return authClient.verifyIdToken({
-                idToken: id_token.id_token,
-                audience: CLIENT_ID,
-            });
+        .then(function convertToUserId(tokenContainer) {
+            id_token = tokenContainer.id_token;
+            if (!id_token) {
+                throw new RestError(statusCodes.BadRequest, statusMessages.BadRequest);
+            }
+            return userService.convertTokenToUserId(id_token);
         })
-        .then(function validateTicket(ticket) {
-            let payload = ticket.getPayload();
-            let userId = payload['sub'];
-
+        .then(function checkUserId(userId) {
             console.log("Logged in as " + userId);
+            console.log("id_token is " + id_token);
 
-            // validate *iss*, must be equal to "accounts.google.com" or "https://accounts.google.com"
+            // TODO: validate that user exists in the database
+
+            // Store in session
+            req.session.id_token = id_token;
 
             res.statusCode = statusCodes.OK;
             // TODO: this is for debug
             res.setHeader('Access-Control-Allow-Origin', '*');
             res.setHeader('Access-Control-Allow-Headers', '*');
-            res.end(userId);
+            res.end();
 
             restStats.countRequestByEndpoint("signin");
             restStats.updateResponseStats(req, res);

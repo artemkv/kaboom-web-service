@@ -41,3 +41,11 @@ Returns
 	details: "amF2YS5sYW5nLklsbGVnYWxTdGF0..."
 }
 ```
+
+# Environment Variables
+
+```
+NODE_PORT=8700
+NODE_IP=localhost
+SESSION_SECRET_KEY=secret
+```

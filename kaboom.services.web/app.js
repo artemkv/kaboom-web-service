@@ -8,10 +8,11 @@ const restStats = require('@artemkv/reststats');
 const errorHandler = require('@artemkv/errorhandler');
 const myRequest = require('@artemkv/myrequest');
 const version = require('./myversion');
-const signinController = require('./signincontroller');
-const crashesController = require('./crashesController');
 const authenticate = require('./authenticate');
 const authorize = require('./authorize');
+const signinController = require('./signincontroller');
+const crashesController = require('./crashesController');
+const crashController = require('./crashController');
 
 dotenv.config();
 let env = process.env;
@@ -45,11 +46,13 @@ server
     .use('/signin', signinController.postToken)
     // TODO: provide sign-out
 
+    // *** Enter the protected area ***
     .use(authenticate)
     .use(authorize)
 
     // Business logic
     .use('/crashes', crashesController.getCrashes)
+    .use('/crash', crashController.getCrash)
 
     // Handles errors
     .use(errorHandler.handle404)

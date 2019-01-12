@@ -9,7 +9,7 @@ const restStats = require('@artemkv/reststats');
 const readJsonStream = require('@artemkv/readjsonstream');
 const userService = require('./userservice');
 
-const postToken = function (req, res, next) {
+const postToken = function postToken(req, res, next) {
     // TODO: this is for debug
     if (req.method === 'OPTIONS') {
         res.statusCode = statusCodes.OK;

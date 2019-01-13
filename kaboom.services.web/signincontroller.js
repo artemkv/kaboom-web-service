@@ -14,8 +14,10 @@ const postToken = function postToken(req, res, next) {
     // TODO: this is for debug
     if (req.method === 'OPTIONS') {
         res.statusCode = statusCodes.OK;
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Headers', '*');
+        res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ALLOW_ORIGIN);
+        res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
         res.end();
         return;
     }
@@ -40,12 +42,8 @@ const postToken = function postToken(req, res, next) {
             return userService.convertTokenToUserId(id_token);
         })
         .then(function storeTokenInSessionAndRetrieveUserInfo(userId) {
-            console.log("Logged in as " + userId);
-            console.log("id_token is " + id_token);
-
             // Store in session
             req.session.id_token = id_token;
-
             return data.getUserInfo(userId);
         })
         .then(function returnUserInfo(userInfo) {
@@ -57,10 +55,11 @@ const postToken = function postToken(req, res, next) {
             let response = JSON.stringify(userDto);
             res.statusCode = statusCodes.OK;
             res.setHeader("Content-Type", "application/json; charset=utf-8");
-            res.setHeader('Cache-Control', 'no-store');            
-            // TODO: this is for debug
-            res.setHeader('Access-Control-Allow-Origin', '*');
-            res.setHeader('Access-Control-Allow-Headers', '*');
+            res.setHeader('Cache-Control', 'no-store');
+            res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ALLOW_ORIGIN);
+            res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
+            res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+            res.setHeader('Access-Control-Allow-Credentials', 'true');
             res.write(response);
             res.end();
 

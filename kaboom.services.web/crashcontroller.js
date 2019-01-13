@@ -32,9 +32,10 @@ const getCrash = function getCrash(req, res, next) {
     res.statusCode = statusCodes.OK;
     res.setHeader("Content-Type", "application/json; charset=utf-8");
     res.setHeader('Cache-Control', 'public, max-age=86400');
-    // TODO: this is for debug
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ALLOW_ORIGIN);
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
     res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.write(response);
     res.end();
 

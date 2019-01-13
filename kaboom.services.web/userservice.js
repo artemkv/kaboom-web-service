@@ -18,7 +18,6 @@ function validateTicket(ticket) {
 
     // TODO: validate *iss*, must be equal to "accounts.google.com" or "https://accounts.google.com"
 
-    // TODO: as an idea, put that user id on the request
     return userId;
 }
 

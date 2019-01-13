@@ -6,11 +6,12 @@ const RestError = require('@artemkv/resterror');
 const restStats = require('@artemkv/reststats');
 
 const post = function post(req, res, next) {
-    // TODO: this is for debug
     if (req.method === 'OPTIONS') {
         res.statusCode = statusCodes.OK;
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Headers', '*');
+        res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ALLOW_ORIGIN);
+        res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
         res.end();
         return;
     }
@@ -23,9 +24,10 @@ const post = function post(req, res, next) {
     req.session = null;
 
     res.statusCode = statusCodes.OK;
-    // TODO: this is for debug
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ALLOW_ORIGIN);
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.end();
 
     restStats.countRequestByEndpoint("signout");

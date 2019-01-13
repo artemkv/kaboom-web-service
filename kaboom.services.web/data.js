@@ -1,6 +1,7 @@
 "use strict";
 
 const MongoClient = require('mongodb').MongoClient;
+const ObjectID = require('mongodb').ObjectID;
 
 function generateAppCode() {
     return '4398759834759'; // TODO:
@@ -114,5 +115,33 @@ const getAppCrashes = function getAppCrashes(appCode) {
     });
 }
 
+const getAppCrash = function getAppCrash(crashId) {
+    return new Promise(function (resolve, reject) {
+        const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, { useNewUrlParser: true });
+        let db = null;
+        client.connect()
+            .then(function saveDb() {
+                db = client.db(process.env.DB_NAME);
+            })
+            .then(function retrieveCrashInfo() {
+                return db.collection('appcrashes').findOne({ _id: ObjectID(crashId) });
+            })
+            .then(function done(crashInfo) {
+                resolve(crashInfo);
+            })
+            .catch(function (err) {
+                reject(err);
+            })
+            .then(function () {
+                // Always close the connection
+                if (client) {
+                    client.close();
+                }
+            });
+    });
+}
+
+
 exports.getUserInfo = getUserInfo;
 exports.getAppCrashes = getAppCrashes;
+exports.getAppCrash = getAppCrash;

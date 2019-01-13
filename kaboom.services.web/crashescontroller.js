@@ -11,8 +11,6 @@ const getCrashes = function getCrashes(req, res, next) {
         throw new RestError(statusCodes.MethodNotAllowed, statusMessages.MethodNotAllowed);
     }
 
-    console.log("Accessing stats as " + req.my.userId); // TODO:
-
     let appCode = req.my.query.appcode;
     if (appCode) {
         if (typeof appCode !== 'string') {

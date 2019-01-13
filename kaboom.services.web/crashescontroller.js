@@ -4,41 +4,50 @@ const statusCodes = require('@artemkv/statuscodes');
 const statusMessages = require('@artemkv/statusmessages');
 const RestError = require('@artemkv/resterror');
 const restStats = require('@artemkv/reststats');
+const data = require('./data');
 
 const getCrashes = function getCrashes(req, res, next) {
     if (req.method !== 'GET') {
         throw new RestError(statusCodes.MethodNotAllowed, statusMessages.MethodNotAllowed);
     }
 
-    console.log("Accessing stats as " + req.my.userId);
+    console.log("Accessing stats as " + req.my.userId); // TODO:
 
-    // TODO: Get the real data
-    let response = JSON.stringify({
-        crashes: [
-            {
-                id: 427348768723,
-                message: "NullReference...",
-                counter: 3
-            },
-            {
-                id: 398475983443,
-                message: "IllegalArgument...",
-                counter: 1
-            }
-        ]
-    });
+    let appCode = req.my.query.appcode;
+    if (appCode) {
+        if (typeof appCode !== 'string') {
+            throw new RestError(statusCodes.BadRequest, statusMessages.BadRequest);
+        }
+    } else {
+        throw new RestError(statusCodes.BadRequest, statusMessages.BadRequest);
+    }
 
-    res.statusCode = statusCodes.OK;
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.setHeader('Cache-Control', 'no-store');
-    // TODO: this is for debug
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', '*');
-    res.write(response);
-    res.end();
+    data.getAppCrashes(appCode)
+        .then(function returnCrashes(crashes) {
+            let crashesDto = crashes.map(x => {
+                return {
+                    id: x._id.toString(),
+                    message: x.message,
+                    count: x.count
+                }
+            });
 
-    restStats.countRequestByEndpoint("crashes");
-    restStats.updateResponseStats(req, res);
+            let response = JSON.stringify(crashesDto);
+            res.statusCode = statusCodes.OK;
+            res.setHeader("Content-Type", "application/json; charset=utf-8");
+            res.setHeader('Cache-Control', 'no-store');
+            // TODO: this is for debug
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.setHeader('Access-Control-Allow-Headers', '*');
+            res.write(response);
+            res.end();
+
+            restStats.countRequestByEndpoint("crashes");
+            restStats.updateResponseStats(req, res);
+        })
+        .catch(function (err) {
+            next(err);
+        });
 }
 
 exports.getCrashes = getCrashes;

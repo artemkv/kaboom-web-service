@@ -22,12 +22,12 @@ Returns
 		{
 			id: 427348768723,
 			message: "NullReference...",
-			counter: 3
+			count: 3
 		},
 		{
 			id: 398475983443,
 			message: "IllegalArgument...",
-			counter: 1
+			count: 1
 		}
 	]
 }
@@ -41,7 +41,7 @@ Returns
 {
 	id: 427348768723,
 	message: "NullReference...",
-	counter: 3,
+	count: 3,
 	details: "amF2YS5sYW5nLklsbGVnYWxTdGF0..."
 }
 ```
@@ -52,4 +52,6 @@ Returns
 NODE_PORT=8700
 NODE_IP=localhost
 SESSION_SECRET_KEY=secret
+MONGODB_CONNECTION_STRING=mongodb://localhost:27017
+DB_NAME=kaboom
 ```

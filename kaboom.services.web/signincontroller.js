@@ -8,6 +8,7 @@ const RestError = require('@artemkv/resterror');
 const restStats = require('@artemkv/reststats');
 const readJsonStream = require('@artemkv/readjsonstream');
 const userService = require('./userservice');
+const data = require('./data');
 
 const postToken = function postToken(req, res, next) {
     // TODO: this is for debug
@@ -31,26 +32,36 @@ const postToken = function postToken(req, res, next) {
 
     let id_token = null;
     promise
-        .then(function convertToUserId(tokenContainer) {
+        .then(function convertTokenToUserId(tokenContainer) {
             id_token = tokenContainer.id_token;
             if (!id_token) {
                 throw new RestError(statusCodes.BadRequest, statusMessages.BadRequest);
             }
             return userService.convertTokenToUserId(id_token);
         })
-        .then(function checkUserId(userId) {
+        .then(function storeTokenInSessionAndRetrieveUserInfo(userId) {
             console.log("Logged in as " + userId);
             console.log("id_token is " + id_token);
-
-            // TODO: validate that user exists in the database
 
             // Store in session
             req.session.id_token = id_token;
 
+            return data.getUserInfo(userId);
+        })
+        .then(function returnUserInfo(userInfo) {
+            let userDto = {
+                userId: userInfo.userId,
+                defaultAppCode: userInfo.defaultAppCode
+            };
+
+            let response = JSON.stringify(userDto);
             res.statusCode = statusCodes.OK;
+            res.setHeader("Content-Type", "application/json; charset=utf-8");
+            res.setHeader('Cache-Control', 'no-store');            
             // TODO: this is for debug
             res.setHeader('Access-Control-Allow-Origin', '*');
             res.setHeader('Access-Control-Allow-Headers', '*');
+            res.write(response);
             res.end();
 
             restStats.countRequestByEndpoint("signin");

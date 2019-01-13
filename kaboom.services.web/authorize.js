@@ -9,7 +9,7 @@ const authorize = function authorize(req, res, next) {
         throw new RestError(statusCodes.Unauthorized, statusMessages.Unauthorized);
     }
 
-    // TODO: Validate that user exists in the database
+    // TODO: verify that user has the right access level
 
     return next();
 };

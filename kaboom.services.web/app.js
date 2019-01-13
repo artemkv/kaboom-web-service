@@ -16,7 +16,6 @@ const crashesController = require('./crashesController');
 const crashController = require('./crashController');
 
 dotenv.config();
-let env = process.env;
 
 let server = connect();
 
@@ -39,7 +38,7 @@ server
     // Session
     .use(cookieSession({
         name: 'session',
-        keys: [env.SESSION_SECRET_KEY],
+        keys: [process.env.SESSION_SECRET_KEY],
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }))
 
@@ -60,8 +59,8 @@ server
     .use(errorHandler.catchAll);
 
 // Start the server
-let port = env.NODE_PORT || 8000;
-let ip = env.NODE_IP || 'localhost';
+let port = process.env.NODE_PORT || 8000;
+let ip = process.env.NODE_IP || 'localhost';
 server.listen(port, ip, function () {
     console.log('Application started');
     console.log('http://' + ip + ":" + port + '/');

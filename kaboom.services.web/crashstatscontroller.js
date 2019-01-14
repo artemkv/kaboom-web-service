@@ -70,7 +70,7 @@ const getCrashStats = function getCrashStats(req, res, next) {
 
 function validatePeriod(period) {
     if (period === 'year' || period === 'month' || period === 'day' ||
-        period === 'hour' || period === 'minute' || period === 'second') {
+        period === 'hour' || period === 'minute') {
         return true;
     }
     throw new RestError(statusCodes.BadRequest, statusMessages.BadRequest);

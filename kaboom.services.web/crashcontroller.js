@@ -31,7 +31,7 @@ const getCrash = function getCrash(req, res, next) {
 
             let response = JSON.stringify(crashDto);
             res.statusCode = statusCodes.OK;
-            res.setHeader("Content-Type", "application/json; charset=utf-8");
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
             res.setHeader('Cache-Control', 'public, max-age=86400');
             res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ALLOW_ORIGIN);
             res.setHeader('Access-Control-Allow-Methods', 'GET');

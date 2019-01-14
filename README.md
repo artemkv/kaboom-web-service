@@ -46,6 +46,10 @@ Returns
 }
 ```
 
+GET /crashstats
+
+GET /uniqueuserstats
+
 # Environment Variables
 
 ```

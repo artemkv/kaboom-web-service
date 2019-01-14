@@ -12,8 +12,10 @@ const authenticate = require('./authenticate');
 const authorize = require('./authorize');
 const signinController = require('./signincontroller');
 const signoutController = require('./signoutcontroller');
-const crashesController = require('./crashesController');
-const crashController = require('./crashController');
+const crashesController = require('./crashescontroller');
+const crashController = require('./crashcontroller');
+const crashStatsController = require('./crashstatscontroller');
+const uniqueUserStatsController = require('./uniqueuserstatscontroller');
 
 dotenv.config();
 
@@ -53,6 +55,8 @@ server
     // Business logic
     .use('/crashes', crashesController.getCrashes)
     .use('/crash', crashController.getCrash)
+    .use('/crashstats', crashStatsController.getCrashStats)
+    .use('/uniqueuserstats', uniqueUserStatsController.getUniqueUserStats)
 
     // Handles errors
     .use(errorHandler.handle404)

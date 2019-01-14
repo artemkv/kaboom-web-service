@@ -7,6 +7,8 @@ function generateAppCode() {
     return '4398759834759'; // TODO:
 }
 
+// TODO: validate that all requests that user does are allowed for her (appId actually belongs to that user)
+
 // If user exists, retrieves the user info
 // If user does not exist, first creates the user
 const getUserInfo = function getUserInfo(userId) {
@@ -141,7 +143,150 @@ const getAppCrash = function getAppCrash(crashId) {
     });
 }
 
+const getAppCrashStats = function getAppCrashStats(appCode, period, dt) {
+    let tableName = '';
+    let periodStart = '';
+    let periodEnd = '';
+    switch (period) {
+        case 'year':
+            tableName = 'appstats.crash.bymonth'
+            periodStart = dt + '01';
+            periodEnd = dt + '12';
+            break;
+        case 'month':
+            tableName = 'appstats.crash.byday'
+            periodStart = dt + '01';
+            periodEnd = dt + '31';
+            break;
+        case 'day':
+            tableName = 'appstats.crash.byhour'
+            periodStart = dt + '00';
+            periodEnd = dt + '23';
+            break;
+        case 'hour':
+            tableName = 'appstats.crash.byminute'
+            periodStart = dt + '00';
+            periodEnd = dt + '59';
+            break;
+        case 'minute':
+            tableName = 'appstats.crash.bysecond'
+            periodStart = dt + '00';
+            periodEnd = dt + '59';
+            break;
+        default:
+            throw new Error(`Unknown period ${period}`);
+    }
+
+    return new Promise(function (resolve, reject) {
+        const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, { useNewUrlParser: true });
+        let db = null;
+        let appInfo = null;
+        client.connect()
+            .then(function saveDb() {
+                db = client.db(process.env.DB_NAME);
+            })
+            .then(function retrieveAppInfo() {
+                return db.collection('applications').findOne({ appCode });
+            })
+            .then(function (app) {
+                if (!app) {
+                    throw new Error(`App with appCode ${appCode} was not found`);
+                }
+                appInfo = app;
+            })
+            .then(function retrieveCrashStats() {
+                return db.collection(tableName).find(
+                    {
+                        appId: appInfo._id.toString(),
+                        dt: { $gte: periodStart, $lte: periodEnd }
+                    }).toArray();
+            })
+            .then(function done(stats) {
+                if (!stats) {
+                    stats = [];
+                }
+                resolve(stats);
+            })
+            .catch(function (err) {
+                reject(err);
+            })
+            .then(function () {
+                // Always close the connection
+                if (client) {
+                    client.close();
+                }
+            });
+    });
+}
+
+const getUniqueUsersStats = function getUniqueUsersStats(appCode, period, dt) {
+    let tableName = '';
+    let periodStart = '';
+    let periodEnd = '';
+    switch (period) {
+        case 'year':
+            tableName = 'uniqueusers.bymonth'
+            periodStart = dt + '01';
+            periodEnd = dt + '12';
+            break;
+        case 'month':
+            tableName = 'uniqueusers.byday'
+            periodStart = dt + '01';
+            periodEnd = dt + '31';
+            break;
+        case 'day':
+            tableName = 'uniqueusers.byhour'
+            periodStart = dt + '00';
+            periodEnd = dt + '23';
+            break;
+        default:
+            throw new Error(`Unknown period ${period}`);
+    }
+
+    return new Promise(function (resolve, reject) {
+        const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, { useNewUrlParser: true });
+        let db = null;
+        let appInfo = null;
+        client.connect()
+            .then(function saveDb() {
+                db = client.db(process.env.DB_NAME);
+            })
+            .then(function retrieveAppInfo() {
+                return db.collection('applications').findOne({ appCode });
+            })
+            .then(function (app) {
+                if (!app) {
+                    throw new Error(`App with appCode ${appCode} was not found`);
+                }
+                appInfo = app;
+            })
+            .then(function retrieveUniqueUserStats() {
+                return db.collection(tableName).find(
+                    {
+                        appId: appInfo._id.toString(),
+                        dt: { $gte: periodStart, $lte: periodEnd }
+                    }).toArray();
+            })
+            .then(function done(stats) {
+                if (!stats) {
+                    stats = [];
+                }
+                resolve(stats);
+            })
+            .catch(function (err) {
+                reject(err);
+            })
+            .then(function () {
+                // Always close the connection
+                if (client) {
+                    client.close();
+                }
+            });
+    });
+}
 
 exports.getUserInfo = getUserInfo;
 exports.getAppCrashes = getAppCrashes;
 exports.getAppCrash = getAppCrash;
+exports.getAppCrashStats = getAppCrashStats;
+exports.getUniqueUsersStats = getUniqueUsersStats;

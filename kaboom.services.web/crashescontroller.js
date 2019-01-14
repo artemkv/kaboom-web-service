@@ -32,7 +32,7 @@ const getCrashes = function getCrashes(req, res, next) {
 
             let response = JSON.stringify(crashesDto);
             res.statusCode = statusCodes.OK;
-            res.setHeader("Content-Type", "application/json; charset=utf-8");
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
             res.setHeader('Cache-Control', 'no-store');
             res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ALLOW_ORIGIN);
             res.setHeader('Access-Control-Allow-Methods', 'GET');

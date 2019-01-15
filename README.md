@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/artemkv/kaboom-web-service.svg?style=svg)](https://circleci.com/gh/artemkv/kaboom-web-service)
+
 Kaboom Web Service
 
 Provides user app registration and statistic endpoints

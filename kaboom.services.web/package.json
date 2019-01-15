@@ -28,6 +28,8 @@
     "request": "2.88.0"
   },
   "scripts": {
-    "test": "mocha"
+    "start": "node app.js",
+    "integration-test": "mocha",
+    "test": "echo TODO"
   }
 }

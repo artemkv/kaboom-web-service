@@ -16,7 +16,10 @@ function validateTicket(ticket) {
     let payload = ticket.getPayload();
     let userId = payload['sub'];
 
-    // TODO: validate *iss*, must be equal to "accounts.google.com" or "https://accounts.google.com"
+    let iss = payload['iss'];
+    if (iss !== 'accounts.google.com' && iss !== 'https://accounts.google.com') {
+        throw new Error("Invalid iss");
+    }
 
     return userId;
 }

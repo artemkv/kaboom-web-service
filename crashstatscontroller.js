@@ -40,6 +40,8 @@ const getCrashStats = function getCrashStats(req, res, next) {
         throw new RestError(statusCodes.BadRequest, statusMessages.BadRequest);
     }
 
+    let origin = req.headers['origin'];
+
     data.getAppCrashStats(appCode, period, dt)
         .then(function returnStats(stats) {
             let statsDto = stats.map(x => {
@@ -53,7 +55,7 @@ const getCrashStats = function getCrashStats(req, res, next) {
             res.statusCode = statusCodes.OK;
             res.setHeader('Content-Type', 'application/json; charset=utf-8');
             res.setHeader('Cache-Control', 'public, max-age=60');
-            res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ALLOW_ORIGIN);
+            res.setHeader('Access-Control-Allow-Origin', origin);
             res.setHeader('Access-Control-Allow-Methods', 'GET');
             res.setHeader('Access-Control-Allow-Headers', '*');
             res.setHeader('Access-Control-Allow-Credentials', 'true');

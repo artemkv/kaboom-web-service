@@ -14,9 +14,9 @@ COPY --chown=node:node . .
 
 USER node
 
-EXPOSE 8000
+EXPOSE 8700
 
 ENV NODE_IP=0.0.0.0
-ENV NODE_PORT=8000
+ENV NODE_PORT=8700
 
 CMD [ "node", "app.js" ]

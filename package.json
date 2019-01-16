@@ -30,6 +30,8 @@
   "scripts": {
     "start": "node app.js",
     "integration-test": "mocha",
-    "test": "echo TODO"
+    "test": "echo TODO",
+    "docker-build": "docker build -t artemkv/kaboom-web-service:1.0.0 .",
+    "docker-push": "docker push artemkv/kaboom-web-service:1.0.0"
   }
 }

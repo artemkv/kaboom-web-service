@@ -44,5 +44,5 @@ jobs:
       - deploy:
           name: Publish docker image to docker hub
           command: |      
-            docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID $DOCKER_HUB_PWD
+            docker login -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
             npm run docker-push

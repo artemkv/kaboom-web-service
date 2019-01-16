@@ -19,6 +19,9 @@ jobs:
     steps:
       - checkout
 
+      - setup_remote_docker:
+          docker_layer_caching: true
+
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -36,4 +39,4 @@ jobs:
       # run tests!
       - run: npm test
 
-
+      - run: npm run docker-build

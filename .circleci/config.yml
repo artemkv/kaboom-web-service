@@ -39,6 +39,13 @@ jobs:
       # run tests!
       - run: npm test
 
+      # run integration tests!
+      - run:
+          name: Run integration tests
+          command: |
+            NODE_ENV=test npm start &
+            npm run integration-test
+
       - run: npm run docker-build
 
       - deploy:

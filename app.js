@@ -63,7 +63,7 @@ server
     .use(errorHandler.catchAll);
 
 // Start the server
-let port = process.env.NODE_PORT || 8000;
+let port = process.env.NODE_PORT || 8700;
 let ip = process.env.NODE_IP || 'localhost';
 server.listen(port, ip, function () {
     console.log('Application started');

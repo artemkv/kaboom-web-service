@@ -23,14 +23,16 @@
     "serve-favicon": "^2.4.3"
   },
   "devDependencies": {
-    "mocha": "5.2.0",
     "chai": "4.1.1",
-    "request": "2.88.0"
+    "cross-env": "^5.2.0",
+    "mocha": "5.2.0",
+    "request": "2.88.0",
+    "wait-on": "^3.2.0"
   },
   "scripts": {
     "start": "node app.js",
-    "integration-test": "mocha",
-    "test": "echo TODO",
+    "integration-test": "wait-on http://localhost:8700/stats && mocha integration-test",
+    "test": "cross-env NODE_ENV=test mocha",
     "docker-build": "docker build -t artemkv/kaboom-web-service:latest .",
     "docker-push": "docker push artemkv/kaboom-web-service:latest"
   }

@@ -2,9 +2,10 @@
 
 const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
+const idgenerator = require('./idgenerator');
 
 function generateAppCode() {
-    return '4398759834759'; // TODO:
+    return idgenerator.getNewId();
 }
 
 // TODO: validate that all requests that user does are allowed for her (appId actually belongs to that user)

@@ -20,11 +20,6 @@ function validateTicket(ticket) {
         throw new Error("Invalid id_token issuer: " + payload.iss);
     }
 
-    // Verify expiration date/time
-    if (payload.exp < Math.floor(new Date().valueOf() / 1000)) {
-        throw new Error("id_token expired at: " + payload.exp);
-    }
-
     let userId = payload['sub'];
 
     return userId;

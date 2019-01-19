@@ -68,6 +68,10 @@ const postToken = function postToken(req, res, next) {
         })
         .catch(function (err) {
             console.log(err); // TODO: log somewhere else
+
+            // Kill the session immediately
+            req.session = null;
+
             // Any error while validating the token is considered unauthorized access
             next(new RestError(statusCodes.Unauthorized, statusMessages.Unauthorized));
         });

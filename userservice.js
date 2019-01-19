@@ -1,6 +1,6 @@
 "use strict";
 
-const CLIENT_ID = '1012739762252-agthbe2e8df58pj08q4rpcejs8ndkq7e.apps.googleusercontent.com'; // TODO: environment?
+const CLIENT_ID = '1012739762252-agthbe2e8df58pj08q4rpcejs8ndkq7e.apps.googleusercontent.com';
 
 const googleAuth = require('google-auth-library');
 
@@ -14,12 +14,18 @@ function validateToken(id_token) {
 
 function validateTicket(ticket) {
     let payload = ticket.getPayload();
-    let userId = payload['sub'];
 
-    let iss = payload['iss'];
-    if (iss !== 'accounts.google.com' && iss !== 'https://accounts.google.com') {
-        throw new Error("Invalid iss");
+    // Verify token issuer
+    if (payload.iss !== 'accounts.google.com' && payload.iss !== 'https://accounts.google.com') {
+        throw new Error("Invalid id_token issuer: " + payload.iss);
     }
+
+    // Verify expiration date/time
+    if (payload.exp < Math.floor(new Date().valueOf() / 1000)) {
+        throw new Error("id_token expired at: " + payload.exp);
+    }
+
+    let userId = payload['sub'];
 
     return userId;
 }

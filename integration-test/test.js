@@ -10,10 +10,10 @@ describe('[REST Api Test Suite]', function () {
 
     it(':( Try accessing root', function (done) {
         request.get(SERVICE_URL, function (error, response, body) {
-            expect(response.statusCode).to.equal(401);
+            expect(response.statusCode).to.equal(404);
 
             let expectedError = {
-                error: "Unauthorized"
+                error: "Not Found"
             };
             let actual = JSON.parse(body);
             expect(actual).to.deep.equal(expectedError);
@@ -24,10 +24,10 @@ describe('[REST Api Test Suite]', function () {
     
     it(':( Try accessing non-existing page', function (done) {
         request.get(`${SERVICE_URL}/xxx`, function (error, response, body) {
-            expect(response.statusCode).to.equal(401);
+            expect(response.statusCode).to.equal(404);
 
             let expectedError = {
-                error: "Unauthorized"
+                error: "Not Found"
             };
             let actual = JSON.parse(body);
             expect(actual).to.deep.equal(expectedError);

@@ -42,7 +42,7 @@ const getCrashStats = function getCrashStats(req, res, next) {
 
     let origin = req.headers['origin'];
 
-    data.getAppCrashStats(appCode, period, dt)
+    data.getAppCrashStats(req.my.userId, appCode, period, dt)
         .then(function returnStats(stats) {
             let statsDto = stats.map(x => {
                 return {
@@ -55,7 +55,7 @@ const getCrashStats = function getCrashStats(req, res, next) {
             res.statusCode = statusCodes.OK;
             res.setHeader('Content-Type', 'application/json; charset=utf-8');
             res.setHeader('Cache-Control', 'public, max-age=60');
-            res.setHeader('Access-Control-Allow-Origin', origin);
+            res.setHeader('Access-Control-Allow-Origin', origin || 'http://localhost');
             res.setHeader('Access-Control-Allow-Methods', 'GET');
             res.setHeader('Access-Control-Allow-Headers', '*');
             res.setHeader('Access-Control-Allow-Credentials', 'true');

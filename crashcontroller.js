@@ -11,6 +11,15 @@ const getCrash = function getCrash(req, res, next) {
         throw new RestError(statusCodes.MethodNotAllowed, statusMessages.MethodNotAllowed);
     }
 
+    let appCode = req.my.query.appcode;
+    if (appCode) {
+        if (typeof appCode !== 'string') {
+            throw new RestError(statusCodes.BadRequest, statusMessages.BadRequest);
+        }
+    } else {
+        throw new RestError(statusCodes.BadRequest, statusMessages.BadRequest);
+    }
+
     let crashId = req.my.query.id;
     if (crashId) {
         if (typeof crashId !== 'string') {
@@ -22,7 +31,7 @@ const getCrash = function getCrash(req, res, next) {
 
     let origin = req.headers['origin'];
 
-    data.getAppCrash(crashId)
+    data.getAppCrash(req.my.userId, appCode, crashId)
         .then(function returnCrash(crash) {
             let crashDto = {
                 id: crash._id.toString(),
@@ -35,7 +44,7 @@ const getCrash = function getCrash(req, res, next) {
             res.statusCode = statusCodes.OK;
             res.setHeader('Content-Type', 'application/json; charset=utf-8');
             res.setHeader('Cache-Control', 'public, max-age=86400');
-            res.setHeader('Access-Control-Allow-Origin', origin);
+            res.setHeader('Access-Control-Allow-Origin', origin || 'http://localhost');
             res.setHeader('Access-Control-Allow-Methods', 'GET');
             res.setHeader('Access-Control-Allow-Headers', '*');
             res.setHeader('Access-Control-Allow-Credentials', 'true');

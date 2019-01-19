@@ -59,6 +59,10 @@ server
     .use('/uniqueuserstats', uniqueUserStatsController.getUniqueUserStats)
 
     // Handles errors
+    .use(function (err, req, res, next) {
+        console.log(err); // TODO: log somewhere else
+        next(err);
+    })
     .use(errorHandler.handle404)
     .use(errorHandler.catchAll);
 

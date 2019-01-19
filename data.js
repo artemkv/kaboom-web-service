@@ -10,11 +10,15 @@ function generateAppCode() {
 
 // TODO: validate that all requests that user does are allowed for her (appId actually belongs to that user)
 
+function getMongoClient() {
+    return new MongoClient(process.env.MONGODB_CONNECTION_STRING, { useNewUrlParser: true });
+}
+
 // If user exists, retrieves the user info
 // If user does not exist, first creates the user
 const getUserInfo = function getUserInfo(userId) {
     return new Promise(function (resolve, reject) {
-        const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, { useNewUrlParser: true });
+        const client = getMongoClient();
         let db = null;
         let userInfo = null;
         client.connect()
@@ -33,7 +37,7 @@ const getUserInfo = function getUserInfo(userId) {
                     },
                     { upsert: true })
             })
-            .then(function (result) {
+            .then(function validateUserUpsert(result) {
                 if (!result.result.ok) {
                     throw new Error(`User with id ${userId} could not be created/updated`);
                 }
@@ -41,7 +45,7 @@ const getUserInfo = function getUserInfo(userId) {
             .then(function retrieveUser() {
                 return db.collection('users').findOne({ userId });
             })
-            .then(function (user) {
+            .then(function validateUser(user) {
                 if (!user) {
                     throw new Error(`User with id ${userId} was not found`);
                 }
@@ -59,7 +63,7 @@ const getUserInfo = function getUserInfo(userId) {
                     { upsert: true }
                 );
             })
-            .then(function (result) {
+            .then(function validateAppUpsert(result) {
                 if (!result.result.ok) {
                     throw new Error(`Application with appCode ${userInfo.defaultAppCode} could not be created/updated`);
                 }
@@ -67,11 +71,10 @@ const getUserInfo = function getUserInfo(userId) {
             .then(function done() {
                 resolve(userInfo);
             })
-            .catch(function (err) {
+            .catch(function catchErrors(err) {
                 reject(err);
             })
-            .then(function () {
-                // Always close the connection
+            .then(function alwaysCloseConnection() {
                 if (client) {
                     client.close();
                 }
@@ -79,26 +82,38 @@ const getUserInfo = function getUserInfo(userId) {
     });
 }
 
-const getAppCrashes = function getAppCrashes(appCode) {
+const getAppCrashes = function getAppCrashes(userId, appCode) {
     return new Promise(function (resolve, reject) {
-        const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, { useNewUrlParser: true });
+        const client = getMongoClient();
         let db = null;
         let appInfo = null;
         client.connect()
             .then(function saveDb() {
                 db = client.db(process.env.DB_NAME);
             })
-            .then(function retrieveAppInfo() {
+            .then(function retrieveUser() {
+                return db.collection('users').findOne({ userId });
+            })
+            .then(function validateUser(user) {
+                if (!user) {
+                    throw new Error(`User with id ${userId} was not found`);
+                }
+                if (user.defaultAppCode !== appCode) {
+                    throw new Error(`User with id ${userId} has no access to application ${appCode}`);
+                }
+            })
+            .then(function retrieveApp() {
                 return db.collection('applications').findOne({ appCode });
             })
-            .then(function (app) {
+            .then(function validateApp(app) {
                 if (!app) {
                     throw new Error(`App with appCode ${appCode} was not found`);
                 }
                 appInfo = app;
             })
             .then(function retrieveCrashes() {
-                return db.collection('appcrashes').find({ appId: appInfo._id.toString() }).toArray();
+                return db.collection('appcrashes')
+                    .find({ appId: appInfo._id.toString() }).toArray();
             })
             .then(function done(crashes) {
                 if (!crashes) {
@@ -106,11 +121,10 @@ const getAppCrashes = function getAppCrashes(appCode) {
                 }
                 resolve(crashes);
             })
-            .catch(function (err) {
+            .catch(function catchErrors(err) {
                 reject(err);
             })
-            .then(function () {
-                // Always close the connection
+            .then(function alwaysCloseConnection() {
                 if (client) {
                     client.close();
                 }
@@ -118,25 +132,45 @@ const getAppCrashes = function getAppCrashes(appCode) {
     });
 }
 
-const getAppCrash = function getAppCrash(crashId) {
+const getAppCrash = function getAppCrash(userId, appCode, crashId) {
     return new Promise(function (resolve, reject) {
-        const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, { useNewUrlParser: true });
+        const client = getMongoClient();
         let db = null;
         client.connect()
             .then(function saveDb() {
                 db = client.db(process.env.DB_NAME);
             })
-            .then(function retrieveCrashInfo() {
-                return db.collection('appcrashes').findOne({ _id: ObjectID(crashId) });
+            .then(function retrieveUser() {
+                return db.collection('users').findOne({ userId });
             })
-            .then(function done(crashInfo) {
-                resolve(crashInfo);
+            .then(function validateUser(user) {
+                if (!user) {
+                    throw new Error(`User with id ${userId} was not found`);
+                }
+                if (user.defaultAppCode !== appCode) {
+                    throw new Error(`User with id ${userId} has no access to application ${appCode}`);
+                }
             })
-            .catch(function (err) {
+            .then(function retrieveApp() {
+                return db.collection('applications').findOne({ appCode });
+            })
+            .then(function validateApp(app) {
+                if (!app) {
+                    throw new Error(`App with appCode ${appCode} was not found`);
+                }
+                appInfo = app;
+            })
+            .then(function retrieveCrash() {
+                return db.collection('appcrashes')
+                    .findOne({ appId: appInfo._id.toString(), _id: ObjectID(crashId) });
+            })
+            .then(function done(crash) {
+                resolve(crash);
+            })
+            .catch(function catchErrors(err) {
                 reject(err);
             })
-            .then(function () {
-                // Always close the connection
+            .then(function alwaysCloseConnection() {
                 if (client) {
                     client.close();
                 }
@@ -144,7 +178,7 @@ const getAppCrash = function getAppCrash(crashId) {
     });
 }
 
-const getAppCrashStats = function getAppCrashStats(appCode, period, dt) {
+const getAppCrashStats = function getAppCrashStats(userId, appCode, period, dt) {
     let tableName = '';
     let periodStart = '';
     let periodEnd = '';
@@ -179,17 +213,28 @@ const getAppCrashStats = function getAppCrashStats(appCode, period, dt) {
     }
 
     return new Promise(function (resolve, reject) {
-        const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, { useNewUrlParser: true });
+        const client = getMongoClient();
         let db = null;
         let appInfo = null;
         client.connect()
             .then(function saveDb() {
                 db = client.db(process.env.DB_NAME);
             })
-            .then(function retrieveAppInfo() {
+            .then(function retrieveUser() {
+                return db.collection('users').findOne({ userId });
+            })
+            .then(function validateUser(user) {
+                if (!user) {
+                    throw new Error(`User with id ${userId} was not found`);
+                }
+                if (user.defaultAppCode !== appCode) {
+                    throw new Error(`User with id ${userId} has no access to application ${appCode}`);
+                }
+            })
+            .then(function retrieveApp() {
                 return db.collection('applications').findOne({ appCode });
             })
-            .then(function (app) {
+            .then(function validateApp(app) {
                 if (!app) {
                     throw new Error(`App with appCode ${appCode} was not found`);
                 }
@@ -208,11 +253,10 @@ const getAppCrashStats = function getAppCrashStats(appCode, period, dt) {
                 }
                 resolve(stats);
             })
-            .catch(function (err) {
+            .catch(function catchErrors(err) {
                 reject(err);
             })
-            .then(function () {
-                // Always close the connection
+            .then(function alwaysCloseConnection() {
                 if (client) {
                     client.close();
                 }
@@ -220,7 +264,7 @@ const getAppCrashStats = function getAppCrashStats(appCode, period, dt) {
     });
 }
 
-const getUniqueUsersStats = function getUniqueUsersStats(appCode, period, dt) {
+const getUniqueUsersStats = function getUniqueUsersStats(userId, appCode, period, dt) {
     let tableName = '';
     let periodStart = '';
     let periodEnd = '';
@@ -245,17 +289,28 @@ const getUniqueUsersStats = function getUniqueUsersStats(appCode, period, dt) {
     }
 
     return new Promise(function (resolve, reject) {
-        const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, { useNewUrlParser: true });
+        const client = getMongoClient();
         let db = null;
         let appInfo = null;
         client.connect()
             .then(function saveDb() {
                 db = client.db(process.env.DB_NAME);
             })
-            .then(function retrieveAppInfo() {
+            .then(function retrieveUser() {
+                return db.collection('users').findOne({ userId });
+            })
+            .then(function validateUser(user) {
+                if (!user) {
+                    throw new Error(`User with id ${userId} was not found`);
+                }
+                if (user.defaultAppCode !== appCode) {
+                    throw new Error(`User with id ${userId} has no access to application ${appCode}`);
+                }
+            })
+            .then(function retrieveApp() {
                 return db.collection('applications').findOne({ appCode });
             })
-            .then(function (app) {
+            .then(function validateApp(app) {
                 if (!app) {
                     throw new Error(`App with appCode ${appCode} was not found`);
                 }
@@ -274,11 +329,10 @@ const getUniqueUsersStats = function getUniqueUsersStats(appCode, period, dt) {
                 }
                 resolve(stats);
             })
-            .catch(function (err) {
+            .catch(function catchErrors(err) {
                 reject(err);
             })
-            .then(function () {
-                // Always close the connection
+            .then(function alwaysCloseConnection() {
                 if (client) {
                     client.close();
                 }

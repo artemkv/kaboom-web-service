@@ -9,7 +9,7 @@ const post = function post(req, res, next) {
     let origin = req.headers['origin'];
     if (req.method === 'OPTIONS') {
         res.statusCode = statusCodes.OK;
-        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Origin', origin || 'http://localhost');
         res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -25,7 +25,7 @@ const post = function post(req, res, next) {
     req.session = null;
 
     res.statusCode = statusCodes.OK;
-    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Origin', origin || 'http://localhost');
     res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.setHeader('Access-Control-Allow-Credentials', 'true');

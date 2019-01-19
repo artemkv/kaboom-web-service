@@ -14,7 +14,7 @@ POST /signout
 
 Closes the client session
 
-GET /crashes
+GET /crashes?appcode=<APP_CODE>
 
 Returns
 
@@ -35,7 +35,7 @@ Returns
 }
 ```
 
-GET /crash?id=398475983443
+GET /crash?appcode=<APP_CODE>&id=<CRASH_ID>
 
 Returns
 
@@ -48,9 +48,39 @@ Returns
 }
 ```
 
-GET /crashstats
+GET /crashstats?appcode=<APP_CODE>&period=month&dt=201901
 
-GET /uniqueuserstats
+Returns
+
+```
+[
+	{
+		"dt": "20190113",
+		"count": 3
+	},
+	{
+		"dt": "20190114",
+		"count": 2
+	}
+]
+```
+
+GET /uniqueuserstats?appcode=<APP_CODE>&period=day&dt=20190114
+
+Returns
+
+```
+[
+	{
+		"dt": "2019011412",
+		"count": 2
+	},
+	{
+		"dt": "2019011420",
+		"count": 1
+	}
+]
+```
 
 # Environment Variables
 

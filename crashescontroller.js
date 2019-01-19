@@ -22,7 +22,7 @@ const getCrashes = function getCrashes(req, res, next) {
 
     let origin = req.headers['origin'];
 
-    data.getAppCrashes(appCode)
+    data.getAppCrashes(req.my.userId, appCode)
         .then(function returnCrashes(crashes) {
             let crashesDto = crashes.map(x => {
                 return {
@@ -36,7 +36,7 @@ const getCrashes = function getCrashes(req, res, next) {
             res.statusCode = statusCodes.OK;
             res.setHeader('Content-Type', 'application/json; charset=utf-8');
             res.setHeader('Cache-Control', 'no-store');
-            res.setHeader('Access-Control-Allow-Origin', origin);
+            res.setHeader('Access-Control-Allow-Origin', origin || 'http://localhost');
             res.setHeader('Access-Control-Allow-Methods', 'GET');
             res.setHeader('Access-Control-Allow-Headers', '*');
             res.setHeader('Access-Control-Allow-Credentials', 'true');

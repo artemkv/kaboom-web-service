@@ -42,7 +42,7 @@ const getUniqueUserStats = function getUniqueUserStats(req, res, next) {
 
     let origin = req.headers['origin'];
 
-    data.getUniqueUsersStats(appCode, period, dt)
+    data.getUniqueUsersStats(req.my.userId, appCode, period, dt)
         .then(function returnStats(stats) {
             let statsDto = stats.map(x => {
                 return {
@@ -55,7 +55,7 @@ const getUniqueUserStats = function getUniqueUserStats(req, res, next) {
             res.statusCode = statusCodes.OK;
             res.setHeader('Content-Type', 'application/json; charset=utf-8');
             res.setHeader('Cache-Control', 'public, max-age=60');
-            res.setHeader('Access-Control-Allow-Origin', origin);
+            res.setHeader('Access-Control-Allow-Origin', origin || 'http://localhost');
             res.setHeader('Access-Control-Allow-Methods', 'GET');
             res.setHeader('Access-Control-Allow-Headers', '*');
             res.setHeader('Access-Control-Allow-Credentials', 'true');

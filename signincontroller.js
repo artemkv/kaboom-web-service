@@ -14,7 +14,7 @@ const postToken = function postToken(req, res, next) {
     let origin = req.headers['origin'];
     if (req.method === 'OPTIONS') {
         res.statusCode = statusCodes.OK;
-        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Origin', origin || 'http://localhost');
         res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -56,7 +56,7 @@ const postToken = function postToken(req, res, next) {
             res.statusCode = statusCodes.OK;
             res.setHeader("Content-Type", "application/json; charset=utf-8");
             res.setHeader('Cache-Control', 'no-store');
-            res.setHeader('Access-Control-Allow-Origin', origin);
+            res.setHeader('Access-Control-Allow-Origin', origin || 'http://localhost');
             res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
             res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
             res.setHeader('Access-Control-Allow-Credentials', 'true');

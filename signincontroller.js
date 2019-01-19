@@ -8,7 +8,7 @@ const RestError = require('@artemkv/resterror');
 const restStats = require('@artemkv/reststats');
 const readJsonStream = require('@artemkv/readjsonstream');
 const userService = require('./userservice');
-const data = require('./data');
+const data = require('./dataprovider').getData();
 
 const postToken = function postToken(req, res, next) {
     let origin = req.headers['origin'];

@@ -4,7 +4,7 @@ const statusCodes = require('@artemkv/statuscodes');
 const statusMessages = require('@artemkv/statusmessages');
 const RestError = require('@artemkv/resterror');
 const restStats = require('@artemkv/reststats');
-const data = require('./data');
+const data = require('./dataprovider').getData();
 
 const getCrashes = function getCrashes(req, res, next) {
     if (req.method !== 'GET') {

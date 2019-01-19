@@ -3,48 +3,63 @@
 const chai = require('chai');
 const expect = chai.expect;
 const Readable = require('stream').Readable;
+const crashesController = require('../crashescontroller');
 
-it(':) TODO', function (done) {
-    done();
-
-/*    let req = new Readable();
-    req.push('');
-    req.push(null);
-
-    req.method = 'POST';
+it(':) Get crashes', function (done) {
+    let req = {};
+    req.method = 'GET';
     req.headers = {
         'content-type': 'application/json'
     };
-
-    let res = {
-        end: verify
+    req.my = {
+        userId: '243245',
+        query: {
+            appcode: '12345'
+        }
     };
 
-    let counter = kafkaConnector.allCallData.counter;
+    let headers = {};
+    let result = {};
+    let res = {
+        end: verify,
+        setHeader: function (key, value) {
+            headers[key] = value;
+        },
+        write: function write(x) {
+            result = JSON.parse(x);
+        }
+    };
 
     function verify(err) {
         if (err) {
             return done(err);
         }
 
-        try {
-            expect(res.statusCode).to.equal(200);
+        expect(res.statusCode).to.equal(200);
 
-            expect(kafkaConnector.allCallData.counter).to.equal(counter + 1);
-            expect(kafkaConnector.lastCallData.topicName).to.equal('launch_event');
-            expect(kafkaConnector.lastCallData.key).to.equal('9735965b-e1cb-4d7f-adb9-a4adf457f61a');
-            let actualEvent = JSON.parse(kafkaConnector.lastCallData.message);
-            expect(actualEvent.t).to.equal('S');
-            expect(actualEvent.a).to.equal('9735965b-e1cb-4d7f-adb9-a4adf457f61a');
-            expect(actualEvent.u).to.equal('User001');
-            expect(actualEvent.dt).to.equal('2018-12-19T16:36:02.632+01');
-            expect(actualEvent.dts).not.be.null;
-        } catch (err) {
-            return done(err);
-        }
+        expect(headers['Content-Type']).to.equal('application/json; charset=utf-8');
+        expect(headers['Cache-Control']).to.equal('no-store');
+
+        expect(result[0].id).to.equal('5c3d26eb7a2b614415e84498');
+        expect(result[0].message).to.equal('Hello Exception1');
+        expect(result[0].count).to.equal(25);
+        expect(result[0]._id).to.be.undefined;
+        expect(result[0].appId).to.be.undefined;
+        expect(result[0].hash).to.be.undefined;
+        expect(result[0].dt).to.be.undefined;
+        expect(result[0].details).to.be.undefined;
+
+        expect(result[1].id).to.equal('5c3d26eb7a2b614415e84499');
+        expect(result[1].message).to.equal('Hello Exception2');
+        expect(result[1].count).to.equal(30);
+        expect(result[1]._id).to.be.undefined;
+        expect(result[1].appId).to.be.undefined;
+        expect(result[1].hash).to.be.undefined;
+        expect(result[1].dt).to.be.undefined;
+        expect(result[1].details).to.be.undefined;
 
         return done();
     }
 
-    eventController.postEvent(req, res, verify);*/
+    crashesController.getCrashes(req, res, verify);
 });

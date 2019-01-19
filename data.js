@@ -8,8 +8,6 @@ function generateAppCode() {
     return idgenerator.getNewId();
 }
 
-// TODO: validate that all requests that user does are allowed for her (appId actually belongs to that user)
-
 function getMongoClient() {
     return new MongoClient(process.env.MONGODB_CONNECTION_STRING, { useNewUrlParser: true });
 }

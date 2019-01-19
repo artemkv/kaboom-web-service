@@ -111,18 +111,6 @@ describe('[REST Api Test Suite]', function () {
         });
     });
 
-    it(':) Signout kills session', function (done) {
-        let options = {
-            url: `${SERVICE_URL}/signout`
-        };
-        request.post(options, function (error, response, body) {
-            expect(response.statusCode).to.equal(200);
-            expect(response.headers['set-cookie'][0]).to.contain('session=;');
-
-            done();
-        });
-    });
-
     it(':( Access crashes without appcode', function (done) {
         let options = {
             url: `${SERVICE_URL}/crashes`,

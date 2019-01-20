@@ -139,6 +139,7 @@ const getAppCrash = function getAppCrash(userId, appCode, crashId) {
     return new Promise(function (resolve, reject) {
         const client = getMongoClient();
         let db = null;
+        let appInfo = null;
         client.connect()
             .then(function saveDb() {
                 db = client.db(process.env.DB_NAME);

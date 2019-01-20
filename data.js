@@ -9,7 +9,12 @@ function generateAppCode() {
 }
 
 function getMongoClient() {
-    return new MongoClient(process.env.MONGODB_CONNECTION_STRING, { useNewUrlParser: true });
+    let options = { useNewUrlParser: true };
+
+    if (process.env.REPLICA_SET_NAME) {
+        options.replicaSet = process.env.REPLICA_SET_NAME;
+    }
+    return new MongoClient(process.env.MONGODB_CONNECTION_STRING, options);
 }
 
 // If user exists, retrieves the user info

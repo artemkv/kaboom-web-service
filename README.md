@@ -90,4 +90,5 @@ NODE_IP=localhost
 SESSION_SECRET_KEY=secret
 MONGODB_CONNECTION_STRING=mongodb://localhost:27017
 DB_NAME=kaboom
+REPLICA_SET_NAME=rs0
 ```

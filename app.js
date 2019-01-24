@@ -7,6 +7,8 @@ const cookieSession = require('cookie-session');
 const restStats = require('@artemkv/reststats');
 const errorHandler = require('@artemkv/errorhandler');
 const myRequest = require('@artemkv/myrequest');
+const requestId = require('./requestid');
+const requestTime = require('./requesttime');
 const version = require('./myversion');
 const authenticate = require('./authenticate');
 const authorize = require('./authorize');
@@ -16,6 +18,7 @@ const crashesController = require('./crashescontroller');
 const crashController = require('./crashcontroller');
 const crashStatsController = require('./crashstatscontroller');
 const uniqueUserStatsController = require('./uniqueuserstatscontroller');
+const logger = require('./logger');
 
 dotenv.config();
 
@@ -23,6 +26,8 @@ let server = connect();
 
 server
     .use(restStats.countRequest)
+    .use(requestTime)
+    .use(requestId)
 
     // favicon
     .use(favicon('./favicon.ico'))
@@ -33,6 +38,12 @@ server
 
     // Assemble my request
     .use(myRequest)
+
+    // Log session
+    .use(function (req, res, next) {
+        logger.logSession(req.my.path);
+        return next();
+    })
 
     // Statistics endpoint
     .use('/stats', restStats.getStats)
@@ -60,7 +71,8 @@ server
 
     // Handles errors
     .use(function (err, req, res, next) {
-        console.log(err); // TODO: log somewhere else
+        console.log(err);
+        logger.logFailedRequest(req, res, err);
         next(err);
     })
     .use(errorHandler.handle404)
@@ -72,5 +84,7 @@ let ip = process.env.NODE_IP || 'localhost';
 server.listen(port, ip, function () {
     console.log('Application started');
     console.log('http://' + ip + ":" + port + '/');
+    logger.initialize();
+    logger.log('Application started: http://' + ip + ":" + port + '/');
     restStats.initialize(version);
 });

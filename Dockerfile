@@ -1,6 +1,6 @@
 FROM node:10
 
-RUN mkdir -p /home/node/kaboom.services.web/node_modules && chown -R node:node /home/node/kaboom.services.web
+RUN mkdir -p /home/node/kaboom.services.web/node_modules && mkdir -p /home/node/kaboom.services.web/log && chown -R node:node /home/node/kaboom.services.web
 
 WORKDIR /home/node/kaboom.services.web
 

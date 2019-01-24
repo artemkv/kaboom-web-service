@@ -1,9 +1,9 @@
 "use strict";
 
-const uuid = require('node-uuid');
+const uuid = require('uuid/v4');
 
 const getNewId = function getNewId() {
-    return uuid.v4()
+    return uuid()
 };
 
 const isValidId = function isValidId(id) {

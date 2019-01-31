@@ -9,10 +9,11 @@ function generateAppCode() {
 }
 
 function getMongoClient() {
-    let options = { useNewUrlParser: true };
+    let options = { useNewUrlParser: true, connectWithNoPrimary: true };
 
     if (process.env.REPLICA_SET_NAME) {
         options.replicaSet = process.env.REPLICA_SET_NAME;
+        options.readPreference = 'primaryPreferred';
     }
     return new MongoClient(process.env.MONGODB_CONNECTION_STRING, options);
 }
@@ -28,17 +29,24 @@ const getUserInfo = function getUserInfo(userId) {
             .then(function saveDb() {
                 db = client.db(process.env.DB_NAME);
             })
-            .then(function ensureUserExists() {
-                return db.collection('users').updateOne(
-                    { userId },
-                    {
-                        $set: { lastAccessedOn: new Date() },
-                        $setOnInsert: {
-                            userId,
-                            defaultAppCode: generateAppCode()
-                        }
-                    },
-                    { upsert: true })
+            .then(function checkIfUserExists() {
+                return db.collection('users').findOne({ userId });
+            })
+            .then(function ensureUserExists(user) {
+                if (!user) {
+                    return db.collection('users').updateOne(
+                        { userId },
+                        {
+                            $set: { modifiedOn: new Date() },
+                            $setOnInsert: {
+                                userId,
+                                defaultAppCode: generateAppCode()
+                            }
+                        },
+                        { upsert: true });
+                } else {
+                    return { result: { ok: 1 } }
+                }
             })
             .then(function validateUserUpsert(result) {
                 if (!result.result.ok) {
@@ -54,17 +62,24 @@ const getUserInfo = function getUserInfo(userId) {
                 }
                 userInfo = user;
             })
-            .then(function ensureDefaultAppExists() {
-                return db.collection('applications').updateOne(
-                    { appCode: userInfo.defaultAppCode },
-                    {
-                        $set: { lastAccessedOn: new Date() },
-                        $setOnInsert: {
-                            appCode: userInfo.defaultAppCode
-                        }
-                    },
-                    { upsert: true }
-                );
+            .then(function checkDefaultAppExists() {
+                return db.collection('applications').findOne({ appCode: userInfo.defaultAppCode });
+            })
+            .then(function ensureDefaultAppExists(app) {
+                if (!app) {
+                    return db.collection('applications').updateOne(
+                        { appCode: userInfo.defaultAppCode },
+                        {
+                            $set: { modifiedOn: new Date() },
+                            $setOnInsert: {
+                                appCode: userInfo.defaultAppCode
+                            }
+                        },
+                        { upsert: true }
+                    );
+                } else {
+                    return { result: { ok: 1 } }
+                }
             })
             .then(function validateAppUpsert(result) {
                 if (!result.result.ok) {
